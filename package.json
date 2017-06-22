@@ -4,7 +4,7 @@
     "react",
     "rxjs"
   ],
-  "version": "0.1.0",
+  "version": "1.0.0",
   "main": "dist/rx-connect.js",
   "module": "dist/rx-connect.es6.js",
   "repository": "https://github.com/seracio/rx-connect.git",
