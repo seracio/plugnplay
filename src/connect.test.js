@@ -1,11 +1,11 @@
-import _ from 'lodash/fp';
+import * as _ from 'lodash/fp';
 import * as React from 'react';
 import renderer from 'react-test-renderer';
-import {Observable, BehaviorSubject} from 'rxjs';
-import {connect, Provider} from './index';
+import { Observable, BehaviorSubject } from 'rxjs';
+import { connect, Provider } from './index';
 
 class MyComponent extends React.Component {
-  render(){
+  render() {
     return <div>hello</div>;
   }
 }
@@ -16,11 +16,11 @@ test('connect: should return a function', () => {
 
 
 test('Connect component: should render false when state.go === false', () => {
-  const store = {none: Observable.never()};
+  const store = { none: Observable.never() };
   const MyComponentWrapped = connect(_.identity)(MyComponent);
 
   class App extends React.Component {
-    render(){
+    render() {
       return <MyComponentWrapped />;
     }
   }
@@ -34,10 +34,10 @@ test('Connect component: should render false when state.go === false', () => {
 });
 
 test('Connect component: should only render the WrappedComponent when go === true', () => {
-  const store = {once: Observable.of(1)};
+  const store = { once: Observable.of(1) };
   const MyComponentWrapped = connect(_.identity)(MyComponent);
   class App extends React.Component {
-    render(){
+    render() {
       return <MyComponentWrapped />;
     }
   }
@@ -51,9 +51,9 @@ test('Connect component: should only render the WrappedComponent when go === tru
 });
 
 test('Connect component: fragment attribute should contains keys specified by the storeToPropsFunc parameter', () => {
-  const store = {hello$: Observable.of('world')};
+  const store = { hello$: Observable.of('world') };
   class MyOtherComponent extends React.Component {
-    render(){
+    render() {
       return <div>{this.props.hello}</div>;
     }
   }
@@ -64,7 +64,7 @@ test('Connect component: fragment attribute should contains keys specified by th
     hello: state.hello$
   }))(MyOtherComponent);
   class App extends React.Component {
-    render(){
+    render() {
       return <MyComponentWrapped />;
     }
   }
