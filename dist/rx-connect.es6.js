@@ -1,5 +1,4 @@
-import { Children, Component, PropTypes, createElement } from 'react';
-import * as React from 'react';
+import React from 'react';
 import { Observable } from 'rxjs/Observable';
 
 var connect = function (storeToPropsFunc) { return function (WrappedComponent) {
@@ -53,13 +52,13 @@ var connect = function (storeToPropsFunc) { return function (WrappedComponent) {
     };
     Connect.prototype.render = function render () {
       var propsToTransfer = Object.assign({}, this.props, this.state);
-      return this.go && createElement( WrappedComponent, propsToTransfer);
+      return this.go && React.createElement( WrappedComponent, propsToTransfer);
     };
 
     return Connect;
-  }(Component));
+  }(React.Component));
   Connect.contextTypes = {
-    store: PropTypes.object.isRequired,
+    store: React.PropTypes.object.isRequired,
   };
 
   return Connect;
@@ -80,18 +79,18 @@ var Provider = (function (superclass) {
   };
 
   Provider.prototype.render = function render () {
-    return Children.only(this.props.children);
+    return React.Children.only(this.props.children);
   };
 
   return Provider;
-}(Component));
+}(React.Component));
 
 Provider.propTypes = {
-  store: PropTypes.object.isRequired,
+  store: React.PropTypes.object.isRequired,
 };
 
 Provider.childContextTypes = {
-  store: PropTypes.object.isRequired,
+  store: React.PropTypes.object.isRequired,
 };
 
 export { connect, Provider };

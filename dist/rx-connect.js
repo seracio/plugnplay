@@ -2,7 +2,9 @@
 
 Object.defineProperty(exports, '__esModule', { value: true });
 
-var React = require('react');
+function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
+
+var React = _interopDefault(require('react'));
 var rxjs_Observable = require('rxjs/Observable');
 
 var connect = function (storeToPropsFunc) { return function (WrappedComponent) {
