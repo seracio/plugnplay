@@ -1,12 +1,9 @@
-import _ from 'lodash/fp';
 import * as React from 'react';
 import { Observable } from 'rxjs/Observable';
 
-const mapWithIndex = _.map.convert({cap: false});
-
 const connect = storeToPropsFunc => WrappedComponent => {
 
-  if(typeof(storeToPropsFunc) !== 'function'){
+  if (typeof (storeToPropsFunc) !== 'function') {
     throw new Error('rc-connect: connect needs a function storeToPropsFunc as parameter');
   }
 
@@ -19,35 +16,35 @@ const connect = storeToPropsFunc => WrappedComponent => {
       this.fragment = storeToPropsFunc(this.context.store);
       // order
       // needed for the listen method
-      this.order = _.keys(this.fragment);
+      this.order = Object.keys(this.fragment);
       // initiate the state
       // to null
-      this.state = _.mapValues(
-        _.constant(null),
-        this.fragment
-      );
+      this.state = this
+        .order
+        .reduce((acc, key) => ({ ...acc, [key]: null }), {});
     }
 
-    componentDidMount(){
+    componentDidMount() {
       this.listen();
     }
 
     listen() {
-      Observable.combineLatest(..._.map(key => this.fragment[key], this.order))
+      // a combine on all streams
+      Observable.combineLatest(...this.order.map(key => this.fragment[key]))
         .subscribe(values => {
-            this.go = true;
-            const state = _.flow(
-              mapWithIndex((value, index) => ({ key: this.order[index], value })),
-              _.keyBy(_.get('key')),
-              _.mapValues(_.get('value'))
-            )(values);
-            this.setState(state);
-          });
+          // render is OK
+          this.go = true;
+          // update the state
+          const state = values.reduce(
+            (acc, value, index) => ({ ...acc, [this.order[index]]: value }),
+            {}
+          );
+          this.setState(state);
+        });
     }
-
     render() {
-      const propsToTransfer = {...this.props, ...this.state};
-      return this.go && <WrappedComponent {...propsToTransfer}/>;
+      const propsToTransfer = { ...this.props, ...this.state };
+      return this.go && <WrappedComponent {...propsToTransfer} />;
     }
   }
   Connect.contextTypes = {
