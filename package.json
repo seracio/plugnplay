@@ -28,12 +28,14 @@
     "react-dom": "^16.0.0",
     "react-test-renderer": "^16.0.0",
     "rollup": "^0.50.0",
+    "rollup-plugin-babel": "^3.0.2",
     "rollup-plugin-commonjs": "^8.0.2",
     "rollup-plugin-node-resolve": "^3.0.0",
     "rxjs": "^5.5.0"
   },
   "scripts": {
     "test": "./node_modules/.bin/jest",
+    "prepublishOnly": "npm run build",
     "build": "./node_modules/.bin/rollup --config rollup.config.js"
   }
 }

@@ -1,7 +1,6 @@
 // @flow
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Observable } from 'rxjs/Observable';
 
 type State = { [key: string]: any };
 

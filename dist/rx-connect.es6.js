@@ -1,96 +1,94 @@
+import PropTypes from 'prop-types';
 import React from 'react';
-import { Observable } from 'rxjs/Observable';
 
-var connect = function (storeToPropsFunc) { return function (WrappedComponent) {
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-  if (typeof (storeToPropsFunc) !== 'function') {
-    throw new Error('rc-connect: connect needs a function storeToPropsFunc as parameter');
-  }
-
-  var Connect = (function (superclass) {
-    function Connect(props, context) {
-      superclass.call(this, props, context);
-      // flag
-      this.go = false;
-      // the fragment of the store we'll listen
-      this.fragment = storeToPropsFunc(this.context.store);
-      // order
-      // needed for the listen method
-      this.order = Object.keys(this.fragment);
-      // initiate the state
-      // to null
-      this.state = this
-        .order
-        .reduce(function (acc, key) { return (( obj = Object.assign({}, acc), obj[key] = null, obj ))
-          var obj; }, {});
+const connect = combinator => (WrappedComponent, WaitingComponent = null) => {
+    if (typeof combinator !== 'function') {
+        throw new Error('rx-connect: connect needs a combinator function as parameter');
     }
 
-    if ( superclass ) Connect.__proto__ = superclass;
-    Connect.prototype = Object.create( superclass && superclass.prototype );
-    Connect.prototype.constructor = Connect;
+    class Connect extends React.Component {
+        // stream
 
-    Connect.prototype.componentDidMount = function componentDidMount () {
-      this.listen();
-    };
+        // state declaration for flow
+        constructor(props, context) {
+            super(props, context);
+            // there will be no rendering of
+            // the encapsulated component
+            // before the first tick
+            this.go = false;
+            // empty state
+            this.state = {};
+        }
+        // subscription
 
-    Connect.prototype.listen = function listen () {
-      var this$1 = this;
+        // oberver
 
-      // a combine on all streams
-      Observable.combineLatest.apply(Observable, this.order.map(function (key) { return this$1.fragment[key]; }))
-        .subscribe(function (values) {
-          // render is OK
-          this$1.go = true;
-          // update the state
-          var state = values.reduce(
-            function (acc, value, index) { return (( obj = Object.assign({}, acc), obj[this$1.order[index]] = value, obj ))
-              var obj; },
-            {}
-          );
-          this$1.setState(state);
-        });
-    };
-    Connect.prototype.render = function render () {
-      var propsToTransfer = Object.assign({}, this.props, this.state);
-      return this.go && React.createElement( WrappedComponent, propsToTransfer);
+        // flag to launch the first
+        // rendering of the encapsulated component
+
+
+        componentDidMount() {
+            this.stream = combinator(this.context.store);
+            if (typeof this.stream === 'undefined' || typeof this.stream.subscribe !== 'function') {
+                throw new Error('rx-connect: combinator should return a Stream');
+            }
+            this.observer = {
+                next: state => {
+                    if (!(state instanceof Object) || Object.keys(state) === 0) {
+                        throw new Error('rx-connect: combinator should return a Stream of key => values');
+                    }
+                    this.go = true;
+                    this.setState(state);
+                }
+            };
+            this.subscription = this.stream.subscribe(this.observer);
+        }
+
+        componentWillUnmount() {
+            this.subscription.unsubscribe();
+        }
+
+        render() {
+            // we pass the applicative props and inject the HOC state
+            // too bad if there are conflicts
+            const propsToTransfer = _extends({}, this.props, this.state);
+            if (this.go) {
+                return React.createElement(WrappedComponent, propsToTransfer);
+            } else {
+                return !!WaitingComponent ? React.createElement(WaitingComponent, this.props) : null;
+            }
+        }
+    }
+    Connect.contextTypes = {
+        store: PropTypes.object.isRequired
     };
 
     return Connect;
-  }(React.Component));
-  Connect.contextTypes = {
-    store: React.PropTypes.object.isRequired,
-  };
+};
 
-  return Connect;
-}; };
+class Provider extends React.Component {
+    constructor(props, context) {
+        super(props, context);
+        this.store = props.store;
+    }
 
-var Provider = (function (superclass) {
-  function Provider(props, context) {
-    superclass.call(this, props, context);
-    this.store = props.store;
-  }
+    getChildContext() {
+        return { store: this.store };
+    }
 
-  if ( superclass ) Provider.__proto__ = superclass;
-  Provider.prototype = Object.create( superclass && superclass.prototype );
-  Provider.prototype.constructor = Provider;
-
-  Provider.prototype.getChildContext = function getChildContext () {
-    return { store: this.store };
-  };
-
-  Provider.prototype.render = function render () {
-    return React.Children.only(this.props.children);
-  };
-
-  return Provider;
-}(React.Component));
+    render() {
+        return React.Children.only(this.props.children);
+    }
+}
 
 Provider.propTypes = {
-  store: React.PropTypes.object.isRequired,
+    store: PropTypes.object.isRequired
 };
 
 Provider.childContextTypes = {
-  store: React.PropTypes.object.isRequired,
+    store: PropTypes.object.isRequired
 };
 
 export { connect, Provider };
