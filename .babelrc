@@ -1,4 +1,39 @@
 {
-  "plugins": ["lodash"],
-  "presets": ["es2015", "stage-2", "react"]
+  "plugins": [
+    "transform-flow-strip-types",
+    "transform-object-rest-spread"
+  ],
+  "presets": [
+    "react"
+  ],
+  "env": {
+    "test": {
+      "presets": [
+        [
+          "env",
+          {
+            "targets": {
+              "node": "current"
+            }
+          }
+        ]
+      ]
+    },
+    "production": {
+      "presets": [
+        [
+          "env",
+          {
+            "targets": {
+              "browsers": [
+                "> 5% in FR"
+              ]
+            },
+            "modules": false,
+            "forceAllTransforms": true
+          }
+        ]
+      ]
+    }
+  }
 }

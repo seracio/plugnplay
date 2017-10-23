@@ -1,0 +1,17 @@
+{
+    "prettier.singleQuote": true,
+    "prettier.eslintIntegration": true,
+    "flowide.enabled": true,
+    "git.enableSmartCommit": true,
+    "javascript.validate.enable": false,
+    "files.associations": {
+        "*.jsx": "javascriptreact"
+    },
+    "prettier.trailingComma": "none",
+    "prettier.jsonEnable": [],
+    "prettier.tabWidth": 4,
+    "prettier.printWidth": 100,
+    "flow.enabled": true,
+    "flow.pathToFlow": "flow",
+    "flow.useNPMPackagedFlow": true
+}

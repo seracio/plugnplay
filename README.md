@@ -1,5 +1,7 @@
 # rx-connect
 
+## Usage
+
 ## Development
 
 ```
