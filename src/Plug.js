@@ -13,7 +13,7 @@ type State = {
 const Plug = ({ combinator, children, defaultValue = null }) => {
     const [value, setValue] = useState(defaultValue);
 
-    return null;
+    return children(value);
 };
 
 class Connector extends React.Component {
