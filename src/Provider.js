@@ -1,5 +1,3 @@
-// @flow
-import PropTypes from 'prop-types';
 import React from 'react';
 
 class Provider extends React.Component {
