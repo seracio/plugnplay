@@ -8,7 +8,7 @@
     "main": "dist/rx-connect.js",
     "umd:main": "dist/rx-connect.umd.js",
     "module": "dist/rx-connect.mjs",
-    "source": "src/index.js",
+    "source": "src/index.tsx",
     "repository": "https://github.com/seracio/rx-connect.git",
     "author": "nicolasmondon <nicolasmondon@gmail.com>",
     "license": "MIT",
@@ -17,18 +17,19 @@
         "rxjs": ">= 6.0.0"
     },
     "devDependencies": {
-        "@babel/core": "^7.2.0",
-        "@babel/preset-env": "^7.2.0",
-        "@babel/preset-react": "^7.0.0",
+        "@types/react": "^16.7.17",
+        "@types/react-dom": "^16.0.11",
         "jest": "^23.6.0",
         "microbundle": "^0.8.3",
         "react": "^16.7.0-alpha.2",
         "react-dom": "^16.7.0-alpha.2",
-        "rxjs": "^6.3.3"
+        "rxjs": "^6.3.3",
+        "typescript": "^3.2.2"
     },
     "scripts": {
         "test": "./node_modules/.bin/jest",
         "prepublishOnly": "npm run build",
-        "build": "./node_modules/.bin/rollup --config rollup.config.js"
+        "build": "microbundle",
+        "dev": "microbundle watch"
     }
 }
