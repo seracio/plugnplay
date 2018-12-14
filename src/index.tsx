@@ -34,9 +34,7 @@ const Plug = React.memo(({ combinator, children, defaultValue = null }: PlugProp
             }
             // observer
             const observer = {
-                next: (state: any) => {
-                    setValue(state);
-                }
+                next: setValue
             };
             // subscription
             const subscription = stream.subscribe(observer);
