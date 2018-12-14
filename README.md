@@ -3,7 +3,7 @@
 ## Usage
 
 ```bash
-npm i react rxjs @seracio/rx-connect
+npm i react@16.7 react-dom@16.7 rxjs@6 @seracio/rx-connect
 ```
 
 ```javascript
