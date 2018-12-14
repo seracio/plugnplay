@@ -1,4 +1,4 @@
-import React, { memo, useState, useContext, useEffect } from 'react';
+import * as React from 'react';
 
 const StoreContext = React.createContext({});
 
@@ -7,7 +7,10 @@ type ProviderProps = {
     children: any;
 };
 
-const Provider = memo(({ store, children }: ProviderProps) => {
+const Provider = React.memo(({ store, children }: ProviderProps) => {
+    if (!(store instanceof Object)) {
+        throw new Error('rx-connect: store should be an Object');
+    }
     return (
         <StoreContext.Provider value={store}>{React.Children.only(children)}</StoreContext.Provider>
     );
@@ -19,10 +22,10 @@ type PlugProps = {
     defaultValue: any;
 };
 
-const Plug = memo(({ combinator, children, defaultValue = null }: PlugProps) => {
-    const [value, setValue] = useState(defaultValue);
-    const store = useContext(StoreContext);
-    useEffect(
+const Plug = React.memo(({ combinator, children, defaultValue = null }: PlugProps) => {
+    const [value, setValue] = React.useState(defaultValue);
+    const store = React.useContext(StoreContext);
+    React.useEffect(
         () => {
             // stream
             const stream = combinator(store);
@@ -32,11 +35,6 @@ const Plug = memo(({ combinator, children, defaultValue = null }: PlugProps) => 
             // observer
             const observer = {
                 next: (state: any) => {
-                    if (!(state instanceof Object) || Object.keys(state).length === 0) {
-                        throw new Error(
-                            'rx-connect: combinator should return a Stream of key => values'
-                        );
-                    }
                     setValue(state);
                 }
             };
