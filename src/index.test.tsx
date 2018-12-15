@@ -3,7 +3,6 @@ import * as TestRenderer from 'react-test-renderer';
 import { of } from 'rxjs';
 import { delay, shareReplay } from 'rxjs/operators';
 import { Plug, Playground, StoreContext } from './index';
-import { async } from 'q';
 
 test('Playground: only the child should be rendered', () => {
     const component = TestRenderer.create(
@@ -72,6 +71,11 @@ test('Plug: stream value should be used', async () => {
             <Plug combinator={store => store.once}>{v => <div>{v}</div>}</Plug>
         </Playground>
     );
-    const tree = component.toJSON();
-    expect(tree).toMatchSnapshot();
+    await new Promise(res =>
+        setTimeout(() => {
+            const tree = component.toJSON();
+            expect(tree).toMatchSnapshot();
+            res();
+        }, 1000)
+    );
 });

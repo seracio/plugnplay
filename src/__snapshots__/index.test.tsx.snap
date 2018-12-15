@@ -18,4 +18,8 @@ exports[`Plug: defaultValue should be used before stream is defined 1`] = `
 </div>
 `;
 
-exports[`Plug: stream value should be used 1`] = `<div />`;
+exports[`Plug: stream value should be used 1`] = `
+<div>
+  value
+</div>
+`;
