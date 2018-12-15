@@ -1,22 +1,25 @@
-# rx-connect
+# plugnplay
 
 ## Usage
 
 ```bash
-npm i react@16.7 react-dom@16.7 rxjs@6 @seracio/rx-connect
+npm i react@16.7 react-dom@16.7 rxjs@6 @seracio/plugnplay
 ```
 
 ```javascript
+import { Plug, Playground } from '@seracio/plugnplay';
 import React from 'react';
 import { range } from 'rxjs';
 import { shareReplay } from 'rxjs/operators';
 
-const store = range(1, 100).pipe(shareReplay(1));
+const store = {
+    range: range(1, 100).pipe(shareReplay(1))
+};
 
 render(
-    <Provider store={store}>
+    <Playground store={store}>
         <Plug combinator={s => s.range}>{c => <div>{c}</div>}</Plug>
-    </Provider>
+    </Playground>
 );
 ```
 

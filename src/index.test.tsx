@@ -1,7 +1,7 @@
 import * as React from 'react';
 import * as TestRenderer from 'react-test-renderer';
-import { Plug, Provider } from './index';
+import { Plug, Playground } from './index';
 
-test('Provider should exists', () => {
-    expect(typeof Plug !== 'undefined');
+test('Playground should exists', () => {
+    expect(typeof Playground !== 'undefined');
 });

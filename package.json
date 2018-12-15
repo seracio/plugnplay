@@ -1,15 +1,15 @@
 {
-    "name": "@seracio/rx-connect",
+    "name": "@seracio/plugnplay",
     "keywords": [
         "react",
         "rxjs"
     ],
     "version": "2.0.0",
-    "main": "dist/rx-connect.js",
-    "umd:main": "dist/rx-connect.umd.js",
-    "module": "dist/rx-connect.mjs",
+    "main": "dist/plugnplay.js",
+    "umd:main": "dist/plugnplay.umd.js",
+    "module": "dist/plugnplay.mjs",
     "source": "src/index.tsx",
-    "repository": "https://github.com/seracio/rx-connect.git",
+    "repository": "https://github.com/seracio/plugnplay.git",
     "author": "nicolasmondon <nicolasmondon@gmail.com>",
     "license": "MIT",
     "peerDependencies": {
