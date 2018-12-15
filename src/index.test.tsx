@@ -14,6 +14,17 @@ test('Playground: only the child should be rendered', () => {
     expect(tree).toMatchSnapshot();
 });
 
+test('Playground: can have multiple children', () => {
+    const component = TestRenderer.create(
+        <Playground store={{ test: 'test' }}>
+            <h1>title</h1>
+            <div>hello world</div>
+        </Playground>
+    );
+    const tree = component.toJSON();
+    expect(tree).toMatchSnapshot();
+});
+
 test('Playground: the child component should have a context with a key "store"', () => {
     const App = () => {
         const store: any = React.useContext(StoreContext);

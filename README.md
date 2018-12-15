@@ -1,6 +1,6 @@
 # plugnplay
 
-> A tiny module to use a dictionnary of Observables as a Store for React
+> A tiny module to use a dictionary of Observables as a Store for React
 
 ## Disclaimer
 
@@ -22,7 +22,7 @@ import React from 'react';
 import { of } from 'rxjs';
 import { shareReplay, delay } from 'rxjs/operators';
 
-// expose a dictionnary of Observables (Behavior Subjects)
+// expose a dictionary of Observables (Behavior Subjects)
 const store = {
     once: of('hello').pipe(
         delay(250),
@@ -32,11 +32,32 @@ const store = {
 
 render(
     <Playground store={store}>
+        <h1>My app</h1>
         <Plug combinator={s => s.once}>
-            {c => (!c ? <div>waiting...</div> : <div>{c}</div>)}
+            {val => (!!val ? <div>{val}</div> : <div>waiting...</div>)}
         </Plug>
     </Playground>
 );
+```
+
+## API
+
+### Playground
+
+```typescript
+type PlaygroundProps = {
+    store: { [key: string]: Observable };
+    children: JSX.Elements;
+};
+```
+
+### Plug
+
+```typescript
+type PlugProps = {
+    combinator: (store) => Observable;
+    defaultValue?: any;
+};
 ```
 
 ## Development

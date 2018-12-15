@@ -14,7 +14,7 @@ const Playground = React.memo(({ store, children }: PlaygroundProps) => {
 
     return (
         <StoreContext.Provider value={store}>
-            {React.Children.only(children)}
+            <React.Fragment>{children}</React.Fragment>
         </StoreContext.Provider>
     );
 });
