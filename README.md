@@ -84,11 +84,11 @@ The value of this Observable will be emitted through a render props function. Ty
         )
     }
 >
-    {props => <MyComp {...props} />}
+    {props => (!!props ? <MyComp {...props} /> : <Waiting />)}
 </Plug>
 ```
 
-As Observables are asynchronous by nature, you can provide a defaultValue if you want a synchronous rendering:
+As Observables are asynchronous by nature, you must provide a defaultValue if you want a synchronous rendering:
 
 ```javascript
 <Plug combinator={store => store.props$} defaultValue={{ count: 0, val: '' }}>
