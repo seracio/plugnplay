@@ -67,7 +67,7 @@ type PlugProps = {
 };
 ```
 
-The `combinator` props is a function that takes the dictionary store as param and will returns the unique Observable we want to plug to.  
+The `combinator` props is a function that takes the dictionary store as param and returns the unique Observable we want to listen to.  
 This Observable can be:
 
 -   an Observable defined in the store
