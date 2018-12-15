@@ -19,21 +19,26 @@ npm i react@16.7 react-dom@16.7 rxjs@6 @seracio/plugnplay
 ```javascript
 import { Plug, Playground } from '@seracio/plugnplay';
 import React from 'react';
-import { of } from 'rxjs';
+import { of, interval } from 'rxjs';
 import { shareReplay, delay } from 'rxjs/operators';
 
 // expose a dictionary of Observables (Behavior Subjects)
 const store = {
-    once: of('hello').pipe(
+    hello$: of('hello').pipe(
         delay(250),
         shareReplay(1)
-    )
+    ),
+    count$: interval(1000).pipe(shareReplay(1))
 };
 
 render(
     <Playground store={store}>
         <h1>My app</h1>
-        <Plug combinator={s => s.once}>
+        <Plug combinator={store => store.hello$}>
+            {val => (!!val ? <div>{val}</div> : <div>waiting...</div>)}
+        </Plug>
+        <p>Here is a counter:</p>
+        <Plug combinator={store => store.count$}>
             {val => (!!val ? <div>{val}</div> : <div>waiting...</div>)}
         </Plug>
     </Playground>
