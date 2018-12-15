@@ -11,3 +11,11 @@ exports[`Playground: the child component should have a context with a key "store
   hello world
 </div>
 `;
+
+exports[`Plug: defaultValue should be used before stream is defined 1`] = `
+<div>
+  default value
+</div>
+`;
+
+exports[`Plug: stream value should be used 1`] = `<div />`;

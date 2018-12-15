@@ -22,7 +22,7 @@ const Playground = React.memo(({ store, children }: PlaygroundProps) => {
 type PlugProps = {
     combinator: any;
     children: Function;
-    defaultValue: any;
+    defaultValue?: any;
 };
 
 const Plug = React.memo(

@@ -1,6 +1,9 @@
 import * as React from 'react';
 import * as TestRenderer from 'react-test-renderer';
+import { of } from 'rxjs';
+import { delay, shareReplay } from 'rxjs/operators';
 import { Plug, Playground, StoreContext } from './index';
+import { async } from 'q';
 
 test('Playground: only the child should be rendered', () => {
     const component = TestRenderer.create(
@@ -37,4 +40,38 @@ test('Playground: props store should be mandatory', () => {
         );
     };
     expect(t).toThrow();
+});
+
+test('Plug: defaultValue should be used before stream is defined', () => {
+    const store = {
+        once: of(1).pipe(
+            delay(100),
+            shareReplay(1)
+        )
+    };
+    const component = TestRenderer.create(
+        <Playground store={store}>
+            <Plug
+                combinator={store => store.once}
+                defaultValue={'default value'}
+            >
+                {v => <div>{v}</div>}
+            </Plug>
+        </Playground>
+    );
+    const tree = component.toJSON();
+    expect(tree).toMatchSnapshot();
+});
+
+test('Plug: stream value should be used', async () => {
+    const store = {
+        once: of('value').pipe(shareReplay(1))
+    };
+    const component = TestRenderer.create(
+        <Playground store={store}>
+            <Plug combinator={store => store.once}>{v => <div>{v}</div>}</Plug>
+        </Playground>
+    );
+    const tree = component.toJSON();
+    expect(tree).toMatchSnapshot();
 });
