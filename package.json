@@ -4,7 +4,7 @@
         "react",
         "rxjs"
     ],
-    "version": "2.0.0",
+    "version": "3.0.0",
     "main": "dist/plugnplay.js",
     "umd:main": "dist/plugnplay.umd.js",
     "module": "dist/plugnplay.mjs",
