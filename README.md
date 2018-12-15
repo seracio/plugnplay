@@ -49,6 +49,8 @@ render(
 
 ### Playground
 
+The `Playground` component is the equivalent of a redux `Provider`.
+
 ```typescript
 type PlaygroundProps = {
     store: { [key: string]: Observable };
@@ -63,6 +65,43 @@ type PlugProps = {
     combinator: (store) => Observable;
     defaultValue?: any;
 };
+```
+
+The `combinator` props is a function that takes the dictionary store as param and will returns the unique Observable we want to plug to.  
+This Observable can be:
+
+-   an Observable defined in the store
+-   a combination of multiple Obserables from the store (thanks to RX operators)
+-   a brand new Observble, unlinked to the store
+
+The value of this Observable will be emitted through a render props function. Typically, you want them to be like props, but nothing mandatory:
+
+```javascript
+<Plug
+    combinator={store =>
+        combineLatest(store.count$, store.val$).pipe(
+            map(([count, val]) => ({ count, val }))
+        )
+    }
+>
+    {props => <MyComp {...props} />}
+</Plug>
+```
+
+As Observables are asynchronous by nature, you can provide a defaultValue if you want a synchronous rendering:
+
+```javascript
+<Plug combinator={store => store.props$} defaultValue={{ count: 0, val: '' }}>
+    {props => <MyComp {...props} />}
+</Plug>
+```
+
+Or you can use a Waiting component as defaultValue is defined as null by default:
+
+```javascript
+<Plug combinator={store => store.props$}>
+    {props => (!!props ? <MyComp {...props} /> : <Waiting />)}
+</Plug>
 ```
 
 ## Development
