@@ -96,7 +96,7 @@ As Observables are asynchronous by nature, you must provide a defaultValue if yo
 </Plug>
 ```
 
-Or you can use a Waiting component as defaultValue is defined as null by default:
+Or you can use a Waiting component, as defaultValue is defined as null by default:
 
 ```javascript
 <Plug combinator={store => store.props$}>
