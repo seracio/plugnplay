@@ -9,7 +9,7 @@ type PlaygroundProps = {
 
 const Playground = React.memo(({ store, children }: PlaygroundProps) => {
     if (!(store instanceof Object)) {
-        throw new Error('rx-connect: store should be an Object');
+        throw new Error('plugnplay: store should be an Object');
     }
 
     return (
@@ -38,7 +38,7 @@ const Plug = React.memo(
                     typeof stream.subscribe !== 'function'
                 ) {
                     throw new Error(
-                        'rx-connect: combinator should return a Stream'
+                        'plugnplay: combinator should return a Stream'
                     );
                 }
                 // observer
@@ -56,4 +56,4 @@ const Plug = React.memo(
     }
 );
 
-export { Playground, Plug };
+export { Playground, Plug, StoreContext };
