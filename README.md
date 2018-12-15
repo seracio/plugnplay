@@ -74,7 +74,7 @@ This Observable can be:
 -   a combination of multiple Obserables from the store (thanks to RX operators)
 -   a brand new Observble, unlinked to the store
 
-The value of this Observable will be emitted through a render props function. Typically, you want them to be like props, but nothing mandatory:
+The value of this Observable will be emitted through a render props function. Typically, you want them to be formated like props, but nothing mandatory here:
 
 ```javascript
 <Plug
