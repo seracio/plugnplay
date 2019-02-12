@@ -4,7 +4,7 @@
         "react",
         "rxjs"
     ],
-    "version": "3.0.2",
+    "version": "3.0.3",
     "main": "dist/index.js",
     "source": "src/index.tsx",
     "repository": "https://github.com/seracio/plugnplay.git",
