@@ -30,7 +30,7 @@
     "scripts": {
         "test": "jest",
         "prepublishOnly": "npm run build",
-        "build": "microbundle",
+        "build": "rm -rf .rts2* && rm -rf dist && microbundle -f cjs --sourcemap false",
         "dev": "microbundle watch"
     }
 }
