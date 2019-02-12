@@ -5,9 +5,7 @@
         "rxjs"
     ],
     "version": "3.0.1",
-    "main": "dist/plugnplay.js",
-    "umd:main": "dist/plugnplay.umd.js",
-    "module": "dist/plugnplay.mjs",
+    "main": "dist/index.js",
     "source": "src/index.tsx",
     "repository": "https://github.com/seracio/plugnplay.git",
     "author": "nicolasmondon <nicolasmondon@gmail.com>",
