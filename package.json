@@ -5,8 +5,10 @@
         "rxjs"
     ],
     "version": "3.0.3",
-    "main": "dist/index.js",
     "source": "src/index.tsx",
+    "main": "dist/plugnplay.js",
+    "module": "dist/plugnplay.module.js",
+    "unpkg": "dist/fulgur.plugnplay.js",
     "repository": "https://github.com/seracio/plugnplay.git",
     "author": "nicolasmondon <nicolasmondon@gmail.com>",
     "license": "MIT",
@@ -19,7 +21,7 @@
         "@types/react": "^16.7.17",
         "@types/react-dom": "^16.0.11",
         "jest": "^23.6.0",
-        "microbundle": "^0.8.3",
+        "microbundle": "^0.12.3",
         "react": "^16.7.0-alpha.2",
         "react-dom": "^16.7.0-alpha.2",
         "react-test-renderer": "^16.7.0-alpha.2",
@@ -29,8 +31,8 @@
     },
     "scripts": {
         "test": "jest",
-        "prepublishOnly": "npm run build",
-        "build": "rm -rf .rts2* && rm -rf dist && microbundle -f cjs --sourcemap false",
+        "prepublishOnly": "rm -rf dist && yarn build",
+        "build": "microbundle --no-sourcemap --jsx React.createElement",
         "dev": "microbundle watch"
     }
 }
