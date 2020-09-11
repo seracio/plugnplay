@@ -4,7 +4,7 @@
         "react",
         "rxjs"
     ],
-    "version": "3.0.3",
+    "version": "4.0.0",
     "source": "src/index.tsx",
     "main": "dist/plugnplay.js",
     "module": "dist/plugnplay.module.js",
