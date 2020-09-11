@@ -29,31 +29,50 @@ const Plug = React.memo(
     ({ combinator, children, defaultValue = null }: PlugProps) => {
         const [value, setValue] = React.useState(defaultValue);
         const store = React.useContext(StoreContext);
-        React.useEffect(
-            () => {
-                // stream
-                const stream = combinator(store);
-                if (
-                    typeof stream === 'undefined' ||
-                    typeof stream.subscribe !== 'function'
-                ) {
-                    throw new Error(
-                        'plugnplay: combinator should return a Stream'
-                    );
-                }
-                // observer
-                const observer = {
-                    next: setValue
-                };
-                // subscription
-                const subscription = stream.subscribe(observer);
-                // unmount
-                return () => subscription.unsubscribe();
-            },
-            [store]
-        );
+        React.useEffect(() => {
+            // stream
+            const stream = combinator(store);
+            if (
+                typeof stream === 'undefined' ||
+                typeof stream.subscribe !== 'function'
+            ) {
+                throw new Error('plugnplay: combinator should return a Stream');
+            }
+            // observer
+            const observer = {
+                next: setValue
+            };
+            // subscription
+            const subscription = stream.subscribe(observer);
+            // unmount
+            return () => subscription.unsubscribe();
+        }, [store]);
         return children(value);
     }
 );
 
-export { Playground, Plug, StoreContext };
+const usePlug = function (combinator, defaultValue = null) {
+    const [value, setValue] = React.useState(defaultValue);
+    const store = React.useContext(StoreContext);
+    React.useEffect(() => {
+        // stream
+        const stream = combinator(store);
+        if (
+            typeof stream === 'undefined' ||
+            typeof stream.subscribe !== 'function'
+        ) {
+            throw new Error('plugnplay: combinator should return a Stream');
+        }
+        // observer
+        const observer = {
+            next: setValue
+        };
+        // subscription
+        const subscription = stream.subscribe(observer);
+        // unmount
+        return () => subscription.unsubscribe();
+    }, [store]);
+    return value;
+};
+
+export { Playground, Plug, StoreContext, usePlug };
