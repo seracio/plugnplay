@@ -51,7 +51,7 @@ const Plug = React.memo(
     }
 );
 
-const usePlug = function (combinator, defaultValue = null) {
+const usePlug = function (combinator, defaultValue, refresh = null) {
     const [value, setValue] = React.useState(defaultValue);
     const store = React.useContext(StoreContext);
     React.useEffect(() => {
@@ -71,7 +71,7 @@ const usePlug = function (combinator, defaultValue = null) {
         const subscription = stream.subscribe(observer);
         // unmount
         return () => subscription.unsubscribe();
-    }, [store]);
+    }, [store, refresh]);
     return value;
 };
 
