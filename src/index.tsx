@@ -75,4 +75,32 @@ const usePlug = function (combinator, defaultValue, refresh = null) {
     return value;
 };
 
-export { Playground, Plug, StoreContext, usePlug };
+const usePlugSuspense = function (combinator, refresh = null) {
+    const [value, setValue] = React.useState(undefined);
+    const store = React.useContext(StoreContext);
+    React.useEffect(() => {
+        // stream
+        const stream = combinator(store);
+        if (
+            typeof stream === 'undefined' ||
+            typeof stream.subscribe !== 'function'
+        ) {
+            throw new Error('plugnplay: combinator should return a Stream');
+        }
+        // suspense mode init
+        if (value === undefined) {
+            throw stream.toPromise();
+        }
+        // observer
+        const observer = {
+            next: setValue
+        };
+        // subscription
+        const subscription = stream.subscribe(observer);
+        // unmount
+        return () => subscription.unsubscribe();
+    }, [store, refresh]);
+    return value;
+};
+
+export { Playground, Plug, StoreContext, usePlug, usePlugSuspense };
