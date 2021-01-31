@@ -1,9 +1,11 @@
 import * as React from 'react';
 
-const StoreContext = React.createContext({});
+const StoreContext = React.createContext<object>({
+    __cache: new WeakMap()
+});
 
 type PlaygroundProps = {
-    store: { [key: string]: any };
+    store: any;
     children: any;
 };
 
@@ -13,20 +15,25 @@ const Playground = React.memo(({ store, children }: PlaygroundProps) => {
     }
 
     return (
-        <StoreContext.Provider value={store}>
+        <StoreContext.Provider
+            value={{
+                ...store,
+                __cache: new WeakMap()
+            }}
+        >
             <React.Fragment>{children}</React.Fragment>
         </StoreContext.Provider>
     );
 });
 
 type PlugProps = {
-    combinator: any;
+    combinator: (store: any) => any;
     children: Function;
     defaultValue?: any;
 };
 
 const Plug = React.memo(
-    ({ combinator, children, defaultValue = null }: PlugProps) => {
+    ({ combinator, children, defaultValue = undefined }: PlugProps) => {
         const [value, setValue] = React.useState(defaultValue);
         const store = React.useContext(StoreContext);
         React.useEffect(() => {
@@ -75,32 +82,26 @@ const usePlug = function (combinator, defaultValue, refresh = null) {
     return value;
 };
 
-const usePlugSuspense = function (combinator, refresh = null) {
-    const [value, setValue] = React.useState(undefined);
-    const store = React.useContext(StoreContext);
+// https://www.webtips.dev/how-to-improve-data-fetching-in-react-with-suspense
+const useSuspendedPlug = function (combinator) {
+    const store: any = React.useContext(StoreContext);
+    const stream = combinator(store);
+    const [value, setValue] = React.useState(store.__cache?.[stream]);
+
     React.useEffect(() => {
-        // stream
-        const stream = combinator(store);
-        if (
-            typeof stream === 'undefined' ||
-            typeof stream.subscribe !== 'function'
-        ) {
-            throw new Error('plugnplay: combinator should return a Stream');
-        }
-        // suspense mode init
-        if (value === undefined) {
-            throw stream.toPromise();
-        }
-        // observer
-        const observer = {
-            next: setValue
-        };
-        // subscription
-        const subscription = stream.subscribe(observer);
-        // unmount
-        return () => subscription.unsubscribe();
-    }, [store, refresh]);
+        stream.subscribe({
+            next: (val) => {
+                store.__cache[stream] = val;
+                setValue(val);
+            }
+        });
+    }, []);
+
+    if (typeof value === 'undefined') {
+        throw stream.toPromise().then((val) => (store.__cache[stream] = val));
+    }
+
     return value;
 };
 
-export { Playground, Plug, StoreContext, usePlug, usePlugSuspense };
+export { Playground, Plug, StoreContext, usePlug, useSuspendedPlug };
