@@ -1,5 +1,7 @@
 # plugnplay
 
+![](https://circleci.com/gh/seracio/plugnplay.svg?style=svg)
+
 > A tiny module to use a dictionary of Observables as a Store for React
 
 ## Disclaimer
@@ -24,22 +26,19 @@ import { shareReplay, delay } from 'rxjs/operators';
 
 // expose a dictionary of Observables (Behavior Subjects)
 const store = {
-    hello$: of('hello').pipe(
-        delay(250),
-        shareReplay(1)
-    ),
+    hello$: of('hello').pipe(delay(250), shareReplay(1)),
     count$: interval(1000).pipe(shareReplay(1))
 };
 
 render(
     <Playground store={store}>
         <h1>My app</h1>
-        <Plug combinator={store => store.hello$}>
-            {val => (!!val ? <div>{val}</div> : <div>waiting...</div>)}
+        <Plug combinator={(store) => store.hello$}>
+            {(val) => (!!val ? <div>{val}</div> : <div>waiting...</div>)}
         </Plug>
         <p>Here is a counter:</p>
-        <Plug combinator={store => store.count$}>
-            {val => (!!val ? <div>{val}</div> : <div>waiting...</div>)}
+        <Plug combinator={(store) => store.count$}>
+            {(val) => (!!val ? <div>{val}</div> : <div>waiting...</div>)}
         </Plug>
     </Playground>
 );
@@ -78,29 +77,29 @@ The value of this Observable will be emitted through a render props function. Ty
 
 ```javascript
 <Plug
-    combinator={store =>
+    combinator={(store) =>
         combineLatest(store.count$, store.val$).pipe(
             map(([count, val]) => ({ count, val }))
         )
     }
 >
-    {props => (!!props ? <MyComp {...props} /> : <Waiting />)}
+    {(props) => (!!props ? <MyComp {...props} /> : <Waiting />)}
 </Plug>
 ```
 
 As Observables are asynchronous by nature, you must provide a defaultValue if you want a synchronous rendering:
 
 ```javascript
-<Plug combinator={store => store.props$} defaultValue={{ count: 0, val: '' }}>
-    {props => <MyComp {...props} />}
+<Plug combinator={(store) => store.props$} defaultValue={{ count: 0, val: '' }}>
+    {(props) => <MyComp {...props} />}
 </Plug>
 ```
 
 Or you can use a Waiting component, as defaultValue is defined as null by default:
 
 ```javascript
-<Plug combinator={store => store.props$}>
-    {props => (!!props ? <MyComp {...props} /> : <Waiting />)}
+<Plug combinator={(store) => store.props$}>
+    {(props) => (!!props ? <MyComp {...props} /> : <Waiting />)}
 </Plug>
 ```
 
