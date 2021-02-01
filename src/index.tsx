@@ -1,11 +1,20 @@
 import * as React from 'react';
+import { Observable } from 'rxjs';
 
-const StoreContext = React.createContext<object>({
+//https://www.carlrippon.com/react-context-with-typescript-p1/
+
+type Store = {
+    [key: string]: any;
+};
+
+type Combinator<T> = (s: Store) => Observable<T>;
+
+const StoreContext = React.createContext<Store>({
     __cache: new WeakMap()
 });
 
 type PlaygroundProps = {
-    store: any;
+    store: Store;
     children: any;
 };
 
@@ -26,14 +35,14 @@ const Playground = React.memo(({ store, children }: PlaygroundProps) => {
     );
 });
 
-type PlugProps = {
-    combinator: (store: any) => any;
-    children: Function;
-    defaultValue?: any;
+type PlugProps<T> = {
+    combinator: Combinator<T>;
+    children: (val: any) => T;
+    defaultValue?: T;
 };
 
 const Plug = React.memo(
-    ({ combinator, children, defaultValue = undefined }: PlugProps) => {
+    ({ combinator, children, defaultValue = undefined }: PlugProps<any>) => {
         const [value, setValue] = React.useState(defaultValue);
         const store = React.useContext(StoreContext);
         React.useEffect(() => {
@@ -58,7 +67,11 @@ const Plug = React.memo(
     }
 );
 
-const usePlug = function (combinator, defaultValue, refresh = null) {
+const usePlug = function <T>(
+    combinator: Combinator<T>,
+    defaultValue: T,
+    refresh = null
+) {
     const [value, setValue] = React.useState(defaultValue);
     const store = React.useContext(StoreContext);
     React.useEffect(() => {
@@ -83,14 +96,16 @@ const usePlug = function (combinator, defaultValue, refresh = null) {
 };
 
 // https://www.webtips.dev/how-to-improve-data-fetching-in-react-with-suspense
-const useSuspendedPlug = function (combinator) {
-    const store: any = React.useContext(StoreContext);
+const useSuspendedPlug = function <T>(combinator: Combinator<T>) {
+    const store = React.useContext(StoreContext);
     const stream = combinator(store);
-    const [value, setValue] = React.useState(store.__cache?.[stream]);
+    // @ts-ignore
+    const [value, setValue] = React.useState(store.__cache[stream]);
 
     React.useEffect(() => {
         stream.subscribe({
             next: (val) => {
+                // @ts-ignore
                 store.__cache[stream] = val;
                 setValue(val);
             }
@@ -98,6 +113,7 @@ const useSuspendedPlug = function (combinator) {
     }, []);
 
     if (typeof value === 'undefined') {
+        // @ts-ignore
         throw stream.toPromise().then((val) => (store.__cache[stream] = val));
     }
 
