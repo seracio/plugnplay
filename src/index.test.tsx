@@ -2,17 +2,11 @@ import * as React from 'react';
 import { render, act } from '@testing-library/react';
 import { interval, of } from 'rxjs';
 import { delay, shareReplay, take } from 'rxjs/operators';
-import {
-    Plug,
-    Playground,
-    StoreContext,
-    usePlug,
-    useSuspendedPlug
-} from './index';
+import { Plug, Playground, usePlug, useSuspendedPlug } from './index';
 
 test('Playground: only the child should be rendered', () => {
     const { container } = render(
-        <Playground store={{ test: 'test' }}>
+        <Playground store={{ test: of(0) }}>
             <div>hello world</div>
         </Playground>
     );
@@ -25,7 +19,7 @@ test('Playground: only the child should be rendered', () => {
 
 test('Playground: can have multiple children', () => {
     const { container } = render(
-        <Playground store={{ test: 'test' }}>
+        <Playground store={{ test: of(0) }}>
             <h1>title</h1>
             <div>hello world</div>
         </Playground>
@@ -35,26 +29,6 @@ test('Playground: can have multiple children', () => {
           <h1>
             title
           </h1>
-          <div>
-            hello world
-          </div>
-        </div>
-    `);
-});
-
-test('Playground: the child component should have a context with a key "store"', () => {
-    const App = () => {
-        const store: any = React.useContext(StoreContext);
-        return <div>{store.hello}</div>;
-    };
-
-    const { container } = render(
-        <Playground store={{ hello: 'hello world' }}>
-            <App />
-        </Playground>
-    );
-    expect(container).toMatchInlineSnapshot(`
-        <div>
           <div>
             hello world
           </div>
@@ -80,27 +54,6 @@ test('Plug: defaultValue should be used before stream is defined', () => {
         <div>
           <div>
             default value
-          </div>
-        </div>
-    `);
-});
-
-test('Plug: stream value should be rendered if synchronous', async () => {
-    const store = {
-        once: of('loaded').pipe(shareReplay(1))
-    };
-    const { container } = render(
-        <Playground store={store}>
-            <Plug combinator={(store) => store.once}>
-                {(v) => (!!v ? <div>{v}</div> : <div>waiting</div>)}
-            </Plug>
-        </Playground>
-    );
-
-    expect(container).toMatchInlineSnapshot(`
-        <div>
-          <div>
-            loaded
           </div>
         </div>
     `);
