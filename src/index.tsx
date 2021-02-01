@@ -38,7 +38,7 @@ const Playground = React.memo(({ store, children }: PlaygroundProps) => {
 type PlugProps<T> = {
     combinator: Combinator<T>;
     children: (val: any) => T;
-    defaultValue: T;
+    defaultValue?: T;
 };
 
 const Plug = React.memo(
