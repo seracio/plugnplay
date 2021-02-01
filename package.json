@@ -32,7 +32,7 @@
     },
     "scripts": {
         "test": "jest",
-        "prepublishOnly": "rm -rf dist && yarn build",
+        "prepublishOnly": "rm -rf dist && npm run build",
         "build": "microbundle --no-sourcemap --jsx React.createElement",
         "dev": "microbundle watch"
     }
