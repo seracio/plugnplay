@@ -2,12 +2,11 @@ import * as React from 'react';
 import { Observable } from 'rxjs';
 
 //https://www.carlrippon.com/react-context-with-typescript-p1/
+// https://medium.com/@mtiller/react-16-3-context-api-intypescript-45c9eeb7a384
 
-type Store = {
-    [key: string]: any;
-};
+type Store = any;
 
-type Combinator<T> = (s: Store) => Observable<T>;
+type Combinator<S, V> = (s: S) => Observable<V>;
 
 const StoreContext = React.createContext<Store>({
     __cache: new WeakMap()
@@ -18,31 +17,37 @@ type PlaygroundProps = {
     children: any;
 };
 
-const Playground = React.memo(({ store, children }: PlaygroundProps) => {
-    if (!(store instanceof Object)) {
-        throw new Error('plugnplay: store should be an Object');
+export const Playground = React.memo(
+    ({ store, children }: PlaygroundProps): React.ReactElement => {
+        if (!(store instanceof Object)) {
+            throw new Error('plugnplay: store should be an Object');
+        }
+
+        return (
+            <StoreContext.Provider
+                value={{
+                    ...store,
+                    __cache: new WeakMap()
+                }}
+            >
+                <React.Fragment>{children}</React.Fragment>
+            </StoreContext.Provider>
+        );
     }
+);
 
-    return (
-        <StoreContext.Provider
-            value={{
-                ...store,
-                __cache: new WeakMap()
-            }}
-        >
-            <React.Fragment>{children}</React.Fragment>
-        </StoreContext.Provider>
-    );
-});
-
-type PlugProps<T> = {
-    combinator: Combinator<T>;
-    children: (val: any) => T;
-    defaultValue?: T;
+type PlugProps<S, V> = {
+    combinator: Combinator<S, V>;
+    children: (val: V) => React.ReactElement;
+    defaultValue?: V;
 };
 
-const Plug = React.memo(
-    ({ combinator, children, defaultValue = undefined }: PlugProps<any>) => {
+export const Plug = React.memo(
+    ({
+        combinator,
+        children,
+        defaultValue = undefined
+    }: PlugProps<any, any>) => {
         const [value, setValue] = React.useState(defaultValue);
         const store = React.useContext(StoreContext);
         React.useEffect(() => {
@@ -67,9 +72,9 @@ const Plug = React.memo(
     }
 );
 
-const usePlug = function <T>(
-    combinator: Combinator<T>,
-    defaultValue: T,
+export const usePlug = function <S, V>(
+    combinator: Combinator<S, V>,
+    defaultValue: V,
     refresh = null
 ) {
     const [value, setValue] = React.useState(defaultValue);
@@ -96,9 +101,11 @@ const usePlug = function <T>(
 };
 
 // https://www.webtips.dev/how-to-improve-data-fetching-in-react-with-suspense
-const useSuspendedPlug = function <T>(combinator: Combinator<T>) {
-    const store = React.useContext(StoreContext);
-    const stream = combinator(store);
+export const useSuspendedPlug = function <S, V>(
+    combinator: Combinator<S, V>
+): V {
+    const store: S = React.useContext(StoreContext);
+    const stream: Observable<unknown> = combinator(store);
     // @ts-ignore
     const [value, setValue] = React.useState(store.__cache[stream]);
 
@@ -119,5 +126,3 @@ const useSuspendedPlug = function <T>(combinator: Combinator<T>) {
 
     return value;
 };
-
-export { Playground, Plug, StoreContext, usePlug, useSuspendedPlug };

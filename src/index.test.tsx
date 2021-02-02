@@ -65,7 +65,7 @@ test('Plug: stream value should not be used on the first rendering if async', as
     };
     const { container, findByText } = render(
         <Playground store={store}>
-            <Plug combinator={(store) => store.once}>
+            <Plug combinator={(s: typeof store) => s.once}>
                 {(v) => (!!v ? <div>{v}</div> : <div>waiting</div>)}
             </Plug>
         </Playground>
@@ -96,7 +96,7 @@ test('usePlug: stream value should not be used on the first rendering if async',
     };
 
     const Comp = () => {
-        const value = usePlug((s) => s.once, 'waiting');
+        const value = usePlug<typeof store, string>((s) => s.once, 'waiting');
         return <div>{value}</div>;
     };
 
@@ -131,7 +131,7 @@ test('useSuspendedPlug: Suspense should triggered pending stream', async () => {
     };
 
     const Comp = () => {
-        const value = useSuspendedPlug((s) => s.once);
+        const value = useSuspendedPlug<typeof store, string>((s) => s.once);
         return <div>{value}</div>;
     };
 
@@ -170,7 +170,7 @@ test('useSuspendedPlug: rendering should update with stream', async () => {
     };
 
     const Comp = () => {
-        const value = useSuspendedPlug((s) => s.once);
+        const value = useSuspendedPlug<typeof store, number>((s) => s.once);
         return <div>{value}</div>;
     };
 
