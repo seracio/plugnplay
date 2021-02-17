@@ -4,7 +4,7 @@
         "outDir": "build",
         "module": "ESNext",
         "target": "ESNext",
-        "lib": ["es2020", "dom"],
+        "lib": ["ES2020", "DOM", "DOM.Iterable"],
         "sourceMap": true,
         "jsx": "react",
         "moduleResolution": "node",
