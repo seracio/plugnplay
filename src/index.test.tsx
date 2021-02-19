@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { render, act } from '@testing-library/react';
-import { BehaviorSubject, interval, Observable, of } from 'rxjs';
+import { BehaviorSubject, from, interval, Observable, of } from 'rxjs';
 import { delay, shareReplay, subscribeOn, take } from 'rxjs/operators';
 import { Plug, Playground, usePlug, useSuspendedPlug } from './index';
 
@@ -234,22 +234,22 @@ test('useSuspendedPlug: Suspense should triggered a BehaviorSubject', async () =
         );
 
         expect(container).toMatchInlineSnapshot(`
-          <div>
-            <div>
-              waiting
-            </div>
-          </div>
-      `);
+                      <div>
+                        <div>
+                          waiting
+                        </div>
+                      </div>
+              `);
 
         await findByText('loaded');
 
         expect(container).toMatchInlineSnapshot(`
-          <div>
-            <div>
-              loaded
-            </div>
-          </div>
-      `);
+                      <div>
+                        <div>
+                          loaded
+                        </div>
+                      </div>
+              `);
     });
 });
 
@@ -276,21 +276,71 @@ test('useSuspendedPlug: Suspense should triggered a custom Observable', async ()
         );
 
         expect(container).toMatchInlineSnapshot(`
-        <div>
-          <div>
-            waiting
-          </div>
-        </div>
-    `);
+                    <div>
+                      <div>
+                        waiting
+                      </div>
+                    </div>
+            `);
 
         await findByText('loaded');
 
         expect(container).toMatchInlineSnapshot(`
-        <div>
-          <div>
-            loaded
-          </div>
-        </div>
-    `);
+                    <div>
+                      <div>
+                        loaded
+                      </div>
+                    </div>
+            `);
+    });
+});
+
+test('useSuspendedPlug: should manage multiple streams', async () => {
+    const store = {
+        first: of('first').pipe(delay(100)),
+        second: of('second').pipe(delay(20))
+    };
+
+    const CompFirst = () => {
+        const value = useSuspendedPlug<string>((s) => s.first);
+        return <div>{value}</div>;
+    };
+
+    const CompSecond = () => {
+        const value = useSuspendedPlug<string>((s) => s.second);
+        return <div>{value}</div>;
+    };
+
+    await act(async () => {
+        const { container, findByText } = render(
+            <Playground store={store}>
+                <React.Suspense fallback={<div>waiting</div>}>
+                    <CompFirst />
+                    <CompSecond />
+                </React.Suspense>
+            </Playground>
+        );
+
+        expect(container).toMatchInlineSnapshot(`
+                  <div>
+                    <div>
+                      waiting
+                    </div>
+                  </div>
+          `);
+
+        await findByText('second');
+        await findByText('first');
+
+        expect(container).toMatchInlineSnapshot(`
+            <div>
+              <div>
+                first
+              </div>
+              <div>
+                second
+              </div>
+            </div>
+        `);
     });
 });

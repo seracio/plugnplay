@@ -112,14 +112,15 @@ export const useSuspendedPlug = function <V>(combinator: Combinator<V>): V {
     }, []);
 
     if (typeof value === 'undefined') {
-        throw new Promise((res) => {
+        throw new Promise<void>((res) => {
             /**
              * toPromise() does not work for BehaviorSubject nor custom Observable
              * */
             stream.subscribe({
                 next: (val) => {
                     store.__cache[stream as any] = val;
-                    res(val);
+                    //
+                    res();
                 }
             });
         });
