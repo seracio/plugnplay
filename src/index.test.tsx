@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { render, act } from '@testing-library/react';
-import { interval, of } from 'rxjs';
-import { delay, shareReplay, take } from 'rxjs/operators';
+import { BehaviorSubject, interval, Observable, of } from 'rxjs';
+import { delay, shareReplay, subscribeOn, take } from 'rxjs/operators';
 import { Plug, Playground, usePlug, useSuspendedPlug } from './index';
 
 test('Playground: only the child should be rendered', () => {
@@ -96,7 +96,7 @@ test('usePlug: stream value should not be used on the first rendering if async',
     };
 
     const Comp = () => {
-        const value = usePlug<typeof store, string>((s) => s.once, 'waiting');
+        const value = usePlug<string>((s) => s.once, 'waiting');
         return <div>{value}</div>;
     };
 
@@ -131,7 +131,7 @@ test('useSuspendedPlug: Suspense should triggered pending stream', async () => {
     };
 
     const Comp = () => {
-        const value = useSuspendedPlug<typeof store, string>((s) => s.once);
+        const value = useSuspendedPlug<string>((s) => s.once);
         return <div>{value}</div>;
     };
 
@@ -166,11 +166,11 @@ test('useSuspendedPlug: Suspense should triggered pending stream', async () => {
 
 test('useSuspendedPlug: rendering should update with stream', async () => {
     const store = {
-        once: interval(300).pipe(take(2))
+        once: interval(200).pipe(take(2))
     };
 
     const Comp = () => {
-        const value = useSuspendedPlug<typeof store, number>((s) => s.once);
+        const value = useSuspendedPlug<number>((s) => s.once);
         return <div>{value}</div>;
     };
 
@@ -210,5 +210,87 @@ test('useSuspendedPlug: rendering should update with stream', async () => {
               </div>
             </div>
         `);
+    });
+});
+
+test('useSuspendedPlug: Suspense should triggered a BehaviorSubject', async () => {
+    const subject = new BehaviorSubject('loaded');
+    const store = {
+        once: subject
+    };
+
+    const Comp = () => {
+        const value = useSuspendedPlug<string>((s) => s.once);
+        return <div>{value}</div>;
+    };
+
+    await act(async () => {
+        const { container, findByText } = render(
+            <Playground store={store}>
+                <React.Suspense fallback={<div>waiting</div>}>
+                    <Comp />
+                </React.Suspense>
+            </Playground>
+        );
+
+        expect(container).toMatchInlineSnapshot(`
+          <div>
+            <div>
+              waiting
+            </div>
+          </div>
+      `);
+
+        await findByText('loaded');
+
+        expect(container).toMatchInlineSnapshot(`
+          <div>
+            <div>
+              loaded
+            </div>
+          </div>
+      `);
+    });
+});
+
+test('useSuspendedPlug: Suspense should triggered a custom Observable', async () => {
+    const once = new Observable<string>((subscriber) => {
+        setTimeout(() => subscriber.next('loaded'), 250);
+    });
+    const store = {
+        once
+    };
+
+    const Comp = () => {
+        const value = useSuspendedPlug<string>((s) => s.once);
+        return <div>{value}</div>;
+    };
+
+    await act(async () => {
+        const { container, findByText } = render(
+            <Playground store={store}>
+                <React.Suspense fallback={<div>waiting</div>}>
+                    <Comp />
+                </React.Suspense>
+            </Playground>
+        );
+
+        expect(container).toMatchInlineSnapshot(`
+        <div>
+          <div>
+            waiting
+          </div>
+        </div>
+    `);
+
+        await findByText('loaded');
+
+        expect(container).toMatchInlineSnapshot(`
+        <div>
+          <div>
+            loaded
+          </div>
+        </div>
+    `);
     });
 });

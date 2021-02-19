@@ -4,9 +4,9 @@ import { Observable } from 'rxjs';
 //https://www.carlrippon.com/react-context-with-typescript-p1/
 // https://medium.com/@mtiller/react-16-3-context-api-intypescript-45c9eeb7a384
 
-type Store = any;
+type Store = { [key: string]: any };
 
-type Combinator<S, V> = (s: S) => Observable<V>;
+type Combinator<V> = (s: any) => Observable<V>;
 
 const StoreContext = React.createContext<Store>({
     __cache: new WeakMap()
@@ -36,18 +36,14 @@ export const Playground = React.memo(
     }
 );
 
-type PlugProps<S, V> = {
-    combinator: Combinator<S, V>;
+type PlugProps<V> = {
+    combinator: Combinator<V>;
     children: (val: V) => React.ReactElement;
     defaultValue?: V;
 };
 
 export const Plug = React.memo(
-    ({
-        combinator,
-        children,
-        defaultValue = undefined
-    }: PlugProps<any, any>) => {
+    ({ combinator, children, defaultValue = undefined }: PlugProps<any>) => {
         const [value, setValue] = React.useState(defaultValue);
         const store = React.useContext(StoreContext);
         React.useEffect(() => {
@@ -72,8 +68,8 @@ export const Plug = React.memo(
     }
 );
 
-export const usePlug = function <S, V>(
-    combinator: Combinator<S, V>,
+export const usePlug = function <V>(
+    combinator: Combinator<V>,
     defaultValue: V,
     refresh = null
 ) {
@@ -101,27 +97,32 @@ export const usePlug = function <S, V>(
 };
 
 // https://www.webtips.dev/how-to-improve-data-fetching-in-react-with-suspense
-export const useSuspendedPlug = function <S, V>(
-    combinator: Combinator<S, V>
-): V {
-    const store: S = React.useContext(StoreContext);
+export const useSuspendedPlug = function <V>(combinator: Combinator<V>): V {
+    const store = React.useContext(StoreContext);
     const stream: Observable<unknown> = combinator(store);
-    // @ts-ignore
-    const [value, setValue] = React.useState(store.__cache[stream]);
+    const [value, setValue] = React.useState(store.__cache[stream as any]);
 
     React.useEffect(() => {
         stream.subscribe({
             next: (val) => {
-                // @ts-ignore
-                store.__cache[stream] = val;
+                store.__cache[stream as any] = val;
                 setValue(val);
             }
         });
     }, []);
 
     if (typeof value === 'undefined') {
-        // @ts-ignore
-        throw stream.toPromise().then((val) => (store.__cache[stream] = val));
+        throw new Promise((res) => {
+            /**
+             * toPromise() does not work for BehaviorSubject nor custom Observable
+             * */
+            stream.subscribe({
+                next: (val) => {
+                    store.__cache[stream as any] = val;
+                    res(val);
+                }
+            });
+        });
     }
 
     return value;
