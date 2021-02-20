@@ -298,7 +298,7 @@ test('useSuspendedPlug: Suspense should triggered a custom Observable', async ()
 test('useSuspendedPlug: should manage multiple streams', async () => {
     const store = {
         first: of('first').pipe(delay(100)),
-        second: of('second').pipe(delay(20))
+        second: of('second').pipe(delay(200))
     };
 
     const CompFirst = () => {
@@ -329,12 +329,14 @@ test('useSuspendedPlug: should manage multiple streams', async () => {
                   </div>
           `);
 
-        await findByText('second');
         await findByText('first');
+        await findByText('second');
 
         expect(container).toMatchInlineSnapshot(`
             <div>
-              <div>
+              <div
+                style=""
+              >
                 first
               </div>
               <div>

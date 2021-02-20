@@ -100,27 +100,26 @@ export const usePlug = function <V>(
 export const useSuspendedPlug = function <V>(combinator: Combinator<V>): V {
     const store = React.useContext(StoreContext);
     const stream: Observable<V> = combinator(store);
-    const [value, setValue] = React.useState<V>(store.__cache[stream as any]);
+    const [value, setValue] = React.useState<V>(store.__cache.get(stream));
 
     React.useEffect(() => {
         stream.subscribe({
             next: (val) => {
-                store.__cache[stream as any] = val;
+                store.__cache.set(stream, val);
                 setValue(val);
             }
         });
     }, []);
 
     if (typeof value === 'undefined') {
-        throw new Promise<V>((res) => {
+        throw new Promise<void>((res) => {
             /**
              * toPromise() does not work for BehaviorSubject nor custom Observable
              * */
             stream.subscribe({
                 next: (val) => {
-                    store.__cache[stream as any] = val;
-                    //
-                    res(val);
+                    store.__cache.set(stream, val);
+                    res();
                 }
             });
         });
