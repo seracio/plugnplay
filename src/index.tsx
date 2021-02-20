@@ -99,8 +99,8 @@ export const usePlug = function <V>(
 // https://www.webtips.dev/how-to-improve-data-fetching-in-react-with-suspense
 export const useSuspendedPlug = function <V>(combinator: Combinator<V>): V {
     const store = React.useContext(StoreContext);
-    const stream: Observable<unknown> = combinator(store);
-    const [value, setValue] = React.useState(store.__cache[stream as any]);
+    const stream: Observable<V> = combinator(store);
+    const [value, setValue] = React.useState<V>(store.__cache[stream as any]);
 
     React.useEffect(() => {
         stream.subscribe({
@@ -112,7 +112,7 @@ export const useSuspendedPlug = function <V>(combinator: Combinator<V>): V {
     }, []);
 
     if (typeof value === 'undefined') {
-        throw new Promise<void>((res) => {
+        throw new Promise<V>((res) => {
             /**
              * toPromise() does not work for BehaviorSubject nor custom Observable
              * */
@@ -120,7 +120,7 @@ export const useSuspendedPlug = function <V>(combinator: Combinator<V>): V {
                 next: (val) => {
                     store.__cache[stream as any] = val;
                     //
-                    res();
+                    res(val);
                 }
             });
         });
