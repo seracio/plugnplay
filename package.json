@@ -5,10 +5,19 @@
         "rxjs"
     ],
     "version": "5.0.8",
+    "files": [
+        "dist"
+    ],
+    "type": "module",
+    "types": "dist/index.d.ts",
+    "exports": {
+        "require": "./dist/plugnplay.cjs",
+        "default": "./dist/plugnplay.modern.js"
+    },
     "source": "src/index.tsx",
-    "main": "dist/plugnplay.js",
+    "main": "dist/plugnplay.cjs",
     "module": "dist/plugnplay.module.js",
-    "unpkg": "dist/fulgur.plugnplay.js",
+    "unpkg": "dist/plugnplay.umd.js",
     "repository": "https://github.com/seracio/plugnplay.git",
     "author": "nicolasmondon <nicolasmondon@gmail.com>",
     "license": "MIT",
@@ -19,13 +28,13 @@
     "devDependencies": {
         "@testing-library/react": "^11.2.3",
         "@types/jest": "^26.0.20",
-        "@types/react": "^17.0.0",
-        "@types/react-dom": "^17.0.0",
+        "@types/react": "^18.0.21",
+        "@types/react-dom": "^18.0.6",
         "jest": "^26.6.3",
-        "microbundle": "^0.13.0",
+        "microbundle": "^0.15.1",
         "prettier": "^2.2.1",
-        "react": "^17.0.1",
-        "react-dom": "^17.0.1",
+        "react": "^18.2.0",
+        "react-dom": "^18.2.0",
         "rxjs": "^6.6.3",
         "ts-jest": "^26.5.0",
         "typescript": "^4.1.3"
@@ -33,7 +42,7 @@
     "scripts": {
         "test": "jest",
         "prepublishOnly": "rm -rf dist && npm run build",
-        "build": "microbundle --no-sourcemap --jsx React.createElement",
+        "build": "rm -rf dist && microbundle --jsx=React.createElement --sourcemap=false",
         "dev": "microbundle watch"
     }
 }

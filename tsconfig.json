@@ -1,12 +1,12 @@
 {
     "compilerOptions": {
         "allowSyntheticDefaultImports": true,
-        "outDir": "build",
+        "outDir": "dist",
         "module": "ESNext",
         "target": "ESNext",
         "lib": ["ES2020", "DOM", "DOM.Iterable"],
         "sourceMap": true,
-        "jsx": "react",
+        "jsx": "react-jsx",
         "moduleResolution": "node",
         "rootDir": "src",
         "strict": true,
