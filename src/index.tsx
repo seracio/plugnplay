@@ -4,6 +4,7 @@ import {
     memo,
     useContext,
     useEffect,
+    useMemo,
     useState
 } from 'react';
 import { Observable } from 'rxjs';
@@ -30,13 +31,17 @@ export const Playground = memo(
             throw new Error('plugnplay: store should be an Object');
         }
 
+        // Stabilité de la référence avec useMemo
+        const contextValue = useMemo(
+            () => ({
+                ...store,
+                __cache: new WeakMap()
+            }),
+            [store]
+        );
+
         return (
-            <StoreContext.Provider
-                value={{
-                    ...store,
-                    __cache: new WeakMap()
-                }}
-            >
+            <StoreContext.Provider value={contextValue}>
                 <Fragment>{children}</Fragment>
             </StoreContext.Provider>
         );
@@ -50,13 +55,15 @@ export const useStore = function <V>(combinator: Combinator<V>): V {
     const [value, setValue] = useState<V>(store.__cache.get(stream));
 
     useEffect(() => {
-        stream.subscribe({
+        const subscription = stream.subscribe({
             next: (val) => {
                 store.__cache.set(stream, val);
                 setValue(val);
             }
         });
-    }, []);
+
+        return () => subscription.unsubscribe();
+    }, [stream]);
 
     if (typeof value === 'undefined') {
         throw new Promise<void>((res) => {
